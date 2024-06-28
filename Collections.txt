@@ -1,0 +1,490 @@
+Collections
+Interface : List
+_________________________________________________________________________________________________________________________________________________________
+_________________________________________________________________________________________________________________________________________________________
+ArrayList
+
+Internal Working:
+ArrayList is a resizable array implementation of the List interface. It uses a dynamic array to store the elements.
+When an ArrayList is created, it has a default initial capacity. As elements are added, the capacity of the array grows automatically.
+The array is resized by creating a new array with a larger size (usually 1.5 times the old size) and copying the elements from the old array to the new array.
+
+Time Complexity:
+
+Insertion:
+At the end: O(1) on average (amortized). However, if the array needs to be resized, it will be O(n) for that insertion.
+At a specific position: O(n) due to the need to shift elements to make room.
+
+Deletion:
+From the end: O(1).
+From a specific position: O(n) due to the need to shift elements to fill the gap.
+
+Traversal:
+Accessing elements by index: O(1).
+Iterating through the list: O(n).
+
+Thread Safety:
+ArrayList is not synchronized, which means it is not thread-safe. Multiple threads accessing an ArrayList concurrently can lead to unpredictable behavior.
+To make an ArrayList thread-safe, you can:
+Use Collections.synchronizedList(new ArrayList<>()); which returns a synchronized (thread-safe) list backed by the specified list.
+Use other concurrent collections like CopyOnWriteArrayList from java.util.concurrent.
+________________________________________________________________________________________________________________________________________________________
+
+LinkedList
+Internal Working:
+LinkedList is a doubly-linked list implementation of the List and Deque interfaces.
+Each element (node) in the LinkedList contains a reference to the previous and next node.
+The LinkedList class maintains references to the first and last nodes of the list.
+
+Time Complexity:
+
+Insertion:
+At the beginning or end: O(1). Inserting at the beginning or end is constant time since only the head or tail pointers need to be updated.
+At a specific position: O(n). Inserting at a specific position requires traversal to that position.
+Deletion:
+From the beginning or end: O(1). Removing the first or last element is constant time.
+From a specific position: O(n). Removing an element at a specific position requires traversal to that position.
+Traversal:
+Accessing elements by index: O(n). Accessing an element requires traversal from the head or tail to the specific position.
+Iterating through the list: O(n). Traversing the list from start to end.
+
+Thread Safety:
+LinkedList is not synchronized, which means it is not thread-safe. Multiple threads accessing a LinkedList concurrently can lead to unpredictable behavior.
+To make a LinkedList thread-safe, you can:
+Use Collections.synchronizedList(new LinkedList<>()); which returns a synchronized (thread-safe) list backed by the specified list.
+Use other concurrent collections like ConcurrentLinkedDeque from java.util.concurrent.
+_________________________________________________________________________________________________________________________________________________________
+
+CopyOnWriteArrayList in Java
+CopyOnWriteArrayList is a thread-safe variant of ArrayList in which all mutative operations (such as add, set, and remove) are implemented by making a fresh copy of the underlying array. This makes it suitable for situations where reads are frequent and writes are rare.
+
+Internal Working:
+Copy-on-Write Mechanism:
+
+When a write operation (e.g., add, set, remove) is performed, CopyOnWriteArrayList creates a new copy of the underlying array and performs the modification on this new array.
+The reference to the new array is then updated atomically to ensure thread safety.
+This mechanism ensures that readers (threads accessing the list) see a consistent view of the list without being affected by write operations.
+Thread Safety:
+
+Since each write operation involves creating a new array, readers do not need to be synchronized, allowing them to access the list without blocking.
+The cost of this approach is that write operations are more expensive due to the need to copy the entire array.
+Iterator:
+
+Iterators of CopyOnWriteArrayList provide a snapshot of the list at the time the iterator was created.
+They do not reflect subsequent modifications to the list.
+This ensures that iterators are thread-safe without requiring synchronization.
+_________________________________________________________________________________________________________________________________________________________
+ArrayList vs. LinkedList
+Both ArrayList and LinkedList have their strengths and weaknesses, making each better suited for different scenarios.
+
+ArrayList:
+Strengths:
+
+Random Access: ArrayList provides O(1) time complexity for accessing elements by index. This makes it ideal for scenarios where you need fast access to elements.
+Cache-Friendly: ArrayList stores elements in a contiguous block of memory, making better use of CPU cache and improving performance.
+Lower Memory Overhead: ArrayList has less memory overhead compared to LinkedList because it doesn't need to store references for the next and previous nodes.
+Weaknesses:
+
+Insertion/Deletion: Inserting or deleting elements (except at the end) requires shifting elements, resulting in O(n) time complexity. This makes it less efficient for frequent insertions and deletions.
+Resizing: When an ArrayList grows beyond its capacity, it needs to resize (copy elements to a new array), which can be costly.
+LinkedList:
+Strengths:
+
+Insertion/Deletion: LinkedList provides O(1) time complexity for insertion and deletion at the beginning or end of the list, and near O(1) if you have a reference to the node. This makes it ideal for scenarios with frequent insertions and deletions.
+No Resizing: LinkedList does not require resizing since it dynamically allocates memory for each node.
+Weaknesses:
+
+Random Access: Accessing elements by index in a LinkedList requires traversal from the head or tail, resulting in O(n) time complexity.
+Higher Memory Overhead: Each node in a LinkedList stores references to the next and previous nodes, resulting in higher memory overhead compared to ArrayList.
+Less Cache-Friendly: Elements are scattered in memory, leading to poorer CPU cache performance.
+When to Use Which:
+Use ArrayList When:
+
+You need fast access to elements using an index.
+Insertions and deletions are infrequent or primarily occur at the end of the list.
+Memory usage is a concern, and you want to minimize overhead.
+You need a thread-safe implementation and plan to use Collections.synchronizedList.
+Use LinkedList When:
+
+You need fast insertions and deletions at the beginning or end of the list.
+You frequently add and remove elements in the middle of the list.
+You do not need to frequently access elements by index.
+Memory overhead is not a primary concern.
+Example Scenarios:
+ArrayList:
+
+Reading Large Files: When you read data from a large file and store it in a list for random access.
+Element Lookup: When your application frequently needs to look up elements by their index.
+LinkedList:
+
+Queue Implementation: When you need a queue (FIFO) or double-ended queue (Deque) implementation where you frequently add and remove elements from both ends.
+Undo Functionality: When implementing an undo feature, where you need to quickly add and remove states.
+Choosing between ArrayList and LinkedList depends on the specific requirements of your application and the trade-offs you're willing to make between time complexity, memory overhead, and ease of implementation.
+_________________________________________________________________________________________________________________________________________________________
+_________________________________________________________________________________________________________________________________________________________
+
+Interface: Map
+
+HashMap
+HashMap in Java is a widely-used implementation of the Map interface, providing fast access and manipulation of key-value pairs. Here's a detailed explanation of its working, operations, and time complexities:
+
+Working of HashMap
+Internal Structure
+Data Structure: HashMap uses an array of Node objects to store key-value pairs.
+Hashing: When a key-value pair is inserted, the key's hashCode() is used to compute a hash, which determines the index in the array (bucket) where the entry will be stored.
+Collision Handling: If multiple keys hash to the same index (collision), HashMap uses a linked list to manage these entries.
+Resizing: As entries are added to the HashMap, it may resize its internal array to maintain a balance between load factor (default 0.75) and number of entries.
+Key Operations
+Insertion (put Operation):
+
+Description: Inserts a key-value pair into the HashMap.
+Process: Computes the hash of the key, determines the bucket index, and adds the pair to the appropriate bucket. If a collision occurs (another key already exists at the same index), it appends the new entry to the linked list.
+Time Complexity: O(1) on average, assuming a good hash function that distributes keys evenly across buckets. Worst-case complexity is O(n) if all keys hash to the same bucket (linked list degenerates into a linear chain).
+Retrieval (get Operation):
+
+Description: Retrieves the value associated with a given key from the HashMap.
+Process: Computes the hash of the key, locates the bucket index, and searches the linked list (if any) at that index for the key.
+Time Complexity: O(1) on average for retrieval. Worst-case complexity is O(n) if all keys hash to the same bucket.
+Deletion (remove Operation):
+
+Description: Removes the key-value pair associated with a given key from the HashMap.
+Process: Computes the hash of the key, locates the bucket index, and removes the entry from the linked list (if present).
+Time Complexity: O(1) on average for deletion. Worst-case complexity is O(n) if all keys hash to the same bucket.
+Traversal:
+
+Description: Iterates through all key-value pairs in the HashMap.
+Process: Iterates through each bucket in the array and then through each entry in the linked list (if any).
+Time Complexity: O(n), where n is the number of entries in the HashMap.
+
+_________________________________________________________________________________________________________________________________________________________
+
+LinkedHashMap
+
+LinkedHashMap in Java extends HashMap to maintain a doubly-linked list running through all of its entries. This linked list defines the iteration ordering, which is normally the order in which keys were inserted into the map (insertion order). Here's a detailed explanation of its working, operations, and time complexities:
+
+Working of LinkedHashMap
+Internal Structure
+Data Structure: LinkedHashMap combines hash table and linked list implementations to store key-value pairs.
+Hashing: Similar to HashMap, LinkedHashMap uses an array of Node objects to store entries based on their hash codes.
+Linked List: Maintains a doubly-linked list that runs through all entries, preserving the order of insertion.
+Access Order: Optionally, LinkedHashMap can be configured to maintain access order (most-recently accessed entries move to the end of the list).
+Key Operations
+Insertion (put Operation):
+
+Description: Inserts a key-value pair into the LinkedHashMap.
+Process: Computes the hash of the key, determines the bucket index, and adds the pair to the appropriate bucket. Additionally, it updates the linked list to reflect the insertion order.
+Time Complexity: O(1) on average, similar to HashMap. It maintains an insertion-order linked list, which incurs minor additional overhead.
+Retrieval (get Operation):
+
+Description: Retrieves the value associated with a given key from the LinkedHashMap.
+Process: Computes the hash of the key, locates the bucket index, and retrieves the value. If access order is maintained, the accessed entry is moved to the end of the linked list.
+Time Complexity: O(1) on average for retrieval, similar to HashMap.
+Deletion (remove Operation):
+
+Description: Removes the key-value pair associated with a given key from the LinkedHashMap.
+Process: Computes the hash of the key, locates the bucket index, removes the entry from the bucket, and updates the linked list accordingly.
+Time Complexity: O(1) on average for deletion, similar to HashMap.
+Traversal:
+
+Description: Iterates through all key-value pairs in the LinkedHashMap.
+Process: Iteration follows the order of insertion or, if maintained, access order.
+Time Complexity: O(n), where n is the number of entries in the LinkedHashMap. Iteration order is predictable and follows the linked list.
+
+_________________________________________________________________________________________________________________________________________________________
+Treemap
+TreeMap in Java implements the NavigableMap interface and uses a Red-Black tree to store key-value pairs in a sorted order based on the natural ordering of its keys or a custom comparator. Here's a detailed explanation of its working, operations, and time complexities:
+
+Working of TreeMap
+Internal Structure
+Data Structure: TreeMap uses a Red-Black tree, which is a self-balancing binary search tree (BST).
+Ordering: Maintains keys in sorted order (natural order or custom comparator).
+Balancing: The Red-Black tree automatically balances itself to ensure logarithmic time complexity for operations.
+Traversal: Supports in-order traversal, providing keys in sorted order.
+Key Operations
+Insertion (put Operation):
+
+Description: Inserts a key-value pair into the TreeMap.
+Process: Adds the entry to the Red-Black tree based on the key's natural ordering (or custom comparator). If a key already exists, its value is updated.
+Time Complexity: O(log n) for insertion due to the balanced tree structure.
+Retrieval (get Operation):
+
+Description: Retrieves the value associated with a given key from the TreeMap.
+Process: Searches the Red-Black tree for the specified key using binary search.
+Time Complexity: O(log n) for retrieval due to the balanced tree structure.
+Deletion (remove Operation):
+
+Description: Removes the key-value pair associated with a given key from the TreeMap.
+Process: Locates and removes the entry from the Red-Black tree.
+Time Complexity: O(log n) for deletion due to the balanced tree structure.
+Traversal:
+
+Description: Iterates through all key-value pairs in sorted order.
+Process: Uses in-order traversal of the Red-Black tree.
+Time Complexity: O(n) for traversal, where n is the number of entries in the TreeMap.
+_________________________________________________________________________________________________________________________________________________________
+
+WeakHashMap
+
+Internal Working:
+
+Data Structure: Similar to HashMap, but keys are wrapped in WeakReference.
+Garbage Collection: When a key is no longer referenced elsewhere, it is eligible for garbage collection.
+Process: Uses a reference queue to detect when keys are garbage collected and removes corresponding entries.
+Time Complexity:
+
+O(1) for basic operations on average.
+_________________________________________________________________________________________________________________________________________________________
+IdentityHashMap
+
+Internal Working:
+
+Data Structure: Uses an array of key-value pairs.
+Key Comparison: Uses == instead of equals() for key comparison.
+Hashing: Similar to HashMap, but based on System.identityHashCode.
+Time Complexity:
+
+O(1) for basic operations on average.
+_________________________________________________________________________________________________________________________________________________________
+Hashtable
+
+Internal Working:
+
+Data Structure: Similar to HashMap, uses an array of linked lists.
+Synchronization: Methods are synchronized to ensure thread safety.
+Null Handling: Does not allow null keys or values.
+Time Complexity:
+
+O(1) for basic operations on average, with overhead for synchronization.
+__________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________________
+
+Interface : Set
+_________________________________________________________________________________________________________________________________________________________
+
+HashSet
+Working:
+
+Uses a hash table (backed by a HashMap).
+Elements are stored in buckets based on their hash code.
+Does not maintain any order.
+Operations:
+
+add(E e): Adds the specified element to the set if it is not already present.
+remove(Object o): Removes the specified element from the set if it is present.
+contains(Object o): Returns true if the set contains the specified element.
+iterator(): Returns an iterator over the elements in the set.
+Time Complexity:
+
+add, remove, contains: O(1) average case, O(n) worst case (due to hash collisions).
+iterator: O(h) where h is the number of hash table buckets.
+
+                            ***********************************Brief on hashSet working******************************************
+
+                            A HashSet in Java is a collection that implements the Set interface, backed by a hash table (actually a HashMap instance). It allows for efficient storage and retrieval of unique elements, providing constant-time performance for basic operations like add, remove, and contains. Here's a detailed explanation of how HashSet works internally:
+
+Internal Structure
+Hash Table (Backed by HashMap):
+The underlying data structure for a HashSet is a HashMap.
+Each element in the HashSet is stored as a key in the HashMap, with a dummy value (usually PRESENT).
+Key Operations and Their Working
+add Method
+Purpose: Adds the specified element to the set if it is not already present.
+
+Internal Process:
+
+Compute the hash code of the element.
+Determine the index in the hash table using the hash code (usually by hash % table.length).
+Check if the element already exists at that index:
+If the element is found (a collision and the element is in the bucket), do nothing.
+If the element is not found, create a new entry in the bucket (either as the first node or appended to the linked list/tree at that index).
+Time Complexity: O(1) on average, O(n) in the worst case due to hash collisions.
+
+remove Method
+Purpose: Removes the specified element from the set if it is present.
+
+Internal Process:
+
+Compute the hash code of the element.
+Determine the index in the hash table using the hash code.
+Check the bucket at that index:
+If the element is found, remove it from the bucket (remove the node from the linked list/tree).
+If the element is not found, do nothing.
+Time Complexity: O(1) on average, O(n) in the worst case due to hash collisions.
+
+contains Method
+Purpose: Checks if the set contains the specified element.
+
+Internal Process:
+
+Compute the hash code of the element.
+Determine the index in the hash table using the hash code.
+Check the bucket at that index:
+If the element is found, return true.
+If the element is not found, return false.
+Time Complexity: O(1) on average, O(n) in the worst case due to hash collisions.
+
+iterator Method
+Purpose: Returns an iterator over the elements in the set.
+
+Internal Process:
+
+The iterator traverses the hash table, visiting each bucket in turn.
+For each bucket, it iterates over the elements in the linked list/tree at that bucket.
+Time Complexity: O(n) for a full traversal, where n is the number of elements in the set.
+
+Handling Collisions
+Collisions occur when two different elements produce the same hash code, resulting in them being placed in the same bucket. Java's HashSet (via HashMap) handles collisions using separate chaining:
+
+Separate Chaining:
+Each bucket contains a linked list (or a balanced tree if the list becomes too long).
+When a collision occurs, the new element is added to the end of the list (or placed appropriately in the tree).
+When the number of elements in a bucket exceeds a threshold, the list is transformed into a balanced tree to improve performance.
+
+_________________________________________________________________________________________________________________________________________________________
+
+LinkedHashSet
+A LinkedHashSet in Java is a combination of HashSet and LinkedList. It extends HashSet and maintains a doubly-linked list running through all of its entries. This combination provides both constant-time performance for basic operations and maintains the insertion order of elements.
+
+Here's how LinkedHashSet works internally:
+
+Internal Structure
+Hash Table: Like HashSet, LinkedHashSet uses a hash table to store its elements. This allows for O(1) average time complexity for operations like add, remove, and contains.
+
+Doubly-Linked List: In addition to the hash table, LinkedHashSet maintains a doubly-linked list that links all the elements in the order they were inserted. This list maintains the insertion order of the elements.
+
+Key Components
+Hash Table (Backed by HashMap): Used to store elements and provide constant-time performance for basic operations.
+Linked List: Used to maintain the insertion order.
+Internal Node Structure
+Each element in the LinkedHashSet is represented by a node that is part of both the hash table and the linked list. The node contains references to the previous and next elements in the linked list, in addition to the standard hash table references.
+
+How It Works
+Insertion (add Method):
+
+When a new element is added, LinkedHashSet checks the hash table to see if the element already exists.
+If the element does not exist, it is inserted into the hash table and added to the end of the linked list.
+The node representing the element stores references to the previous and next elements in the linked list.
+Deletion (remove Method):
+
+When an element is removed, LinkedHashSet removes the element from the hash table.
+It also updates the links in the linked list to remove the node representing the element, thus maintaining the order of the remaining elements.
+Containment Check (contains Method):
+
+The contains method simply checks if the element exists in the hash table, providing O(1) time complexity.
+Iteration:
+
+Iterating over a LinkedHashSet traverses the elements in the order they were inserted. This is done by following the links in the linked list.
+
+_________________________________________________________________________________________________________________________________________________________
+
+
+TreeSet
+
+A TreeSet in Java is an implementation of the NavigableSet interface, which is backed by a TreeMap. It stores elements in a sorted and ordered manner, typically using a Red-Black tree, which is a self-balancing binary search tree. This ensures that the elements are always stored in sorted order and provides efficient performance for basic operations.
+
+Key Features of TreeSet
+Sorted Order: Elements are stored in ascending order by default.
+Self-Balancing Tree: Internally, it uses a Red-Black tree to maintain balance, ensuring that operations remain efficient.
+Navigable: Provides methods to navigate through the set (e.g., first(), last(), headSet(), tailSet()).
+Key Operations and Their Working
+add Method
+Purpose: Adds the specified element to the set if it is not already present.
+
+Internal Process:
+
+The element is compared with existing elements to determine its correct position.
+The tree structure (Red-Black tree) ensures that the element is added in the correct position to maintain the sorted order.
+If necessary, the tree is rebalanced to maintain its properties.
+Time Complexity: O(log n)
+
+remove Method
+Purpose: Removes the specified element from the set if it is present.
+
+Internal Process:
+
+The element is located in the tree.
+The element is removed, and the tree structure is adjusted to fill the gap.
+If necessary, the tree is rebalanced to maintain its properties.
+Time Complexity: O(log n)
+
+contains Method
+Purpose: Checks if the set contains the specified element.
+
+Internal Process:
+
+The element is located in the tree using binary search.
+Returns true if the element is found, false otherwise.
+Time Complexity: O(log n)
+
+ iterator Method
+Purpose: Returns an iterator over the elements in the set in ascending order.
+
+Internal Process:
+
+The iterator traverses the tree in an in-order manner, visiting each element in ascending order.
+Time Complexity: O(log n) to reach the first element, O(1) per element during iteration.
+
+Navigable Methods
+first(): Returns the first (lowest) element in the set.
+last(): Returns the last (highest) element in the set.
+headSet(E toElement): Returns a view of the portion of this set whose elements are strictly less than toElement.
+tailSet(E fromElement): Returns a view of the portion of this set whose elements are greater than or equal to fromElement.
+subSet(E fromElement, E toElement): Returns a view of the portion of this set whose elements range from fromElement, inclusive, to toElement, exclusive.
+
+_________________________________________________________________________________________________________________________________________________________
+ConcurrentSkipListSet
+ConcurrentSkipListSet is a scalable and concurrent implementation of the NavigableSet interface. It is designed for use in concurrent programming and is backed by a ConcurrentSkipListMap, which is a concurrent and thread-safe implementation of a skip list.
+
+Key Features of ConcurrentSkipListSet
+Concurrent: Supports full concurrency of retrievals and high expected concurrency for updates.
+Sorted: Elements are stored in a sorted manner, providing efficient navigation and range operations.
+Non-blocking: Uses non-blocking algorithms to ensure that the operations do not block other threads.
+Internal Structure
+Skip List: A skip list is a data structure that allows for efficient search, insertion, and deletion operations. It consists of multiple layers of linked lists where each higher layer skips over several elements to allow faster traversal.
+ConcurrentSkipListMap: ConcurrentSkipListSet is backed by a ConcurrentSkipListMap. This map provides the actual implementation of the skip list and ensures thread safety.
+Key Operations and Their Working
+add Method
+Purpose: Adds the specified element to the set if it is not already present.
+
+Internal Process:
+
+The element is compared with existing elements to determine its correct position.
+The skip list structure ensures that the element is added in the correct position to maintain the sorted order.
+The insertion is done in a non-blocking manner to ensure concurrency.
+Time Complexity: O(log n) on average for insertion.
+
+remove Method
+Purpose: Removes the specified element from the set if it is present.
+
+Internal Process:
+
+The element is located in the skip list.
+The element is removed, and the skip list structure is adjusted to maintain order.
+The removal is done in a non-blocking manner to ensure concurrency.
+Time Complexity: O(log n) on average for removal.
+
+contains Method
+Purpose: Checks if the set contains the specified element.
+
+Internal Process:
+
+The element is located in the skip list using a binary search-like mechanism.
+Returns true if the element is found, false otherwise.
+Time Complexity: O(log n) on average for search.
+
+iterator Method
+Purpose: Returns an iterator over the elements in the set in ascending order.
+
+Internal Process:
+
+The iterator traverses the skip list in order, visiting each element in sorted order.
+The traversal is done in a thread-safe manner, ensuring that concurrent modifications do not affect the iterator.
+Time Complexity: O(log n) to reach the first element, O(1) per element during iteration.
+
+Navigable Methods
+first(): Returns the first (lowest) element in the set.
+last(): Returns the last (highest) element in the set.
+headSet(E toElement): Returns a view of the portion of this set whose elements are strictly less than toElement.
+tailSet(E fromElement): Returns a view of the portion of this set whose elements are greater than or equal to fromElement.
+subSet(E fromElement, E toElement): Returns a view of the portion of this set whose elements range from fromElement, inclusive, to toElement, exclusive.
+_________________________________________________________________________________________________________________________________________________________
+_________________________________________________________________________________________________________________________________________________________
